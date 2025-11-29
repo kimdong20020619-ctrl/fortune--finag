@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>운세 결과</title>
+
+    <style>
+        body {
+            background: #f7f9fc;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+        }
+
+        .container {
+            width: 700px;
+            margin: 60px auto;
+            background: #fff;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .info {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .tab-wrapper {
+            display: flex;
+            justify-content: space-between;
+            margin: 25px 0 15px 0;
+            gap: 6px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 0;
+            background: #e5e7eb;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            font-size: 14px;
+        }
+
+        .tab-btn.active {
+            background: #6366f1;
+            color: #ffffff;
+        }
+
+        .fortune-card {
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .value {
+            margin-top: 5px;
+            font-size: 15px;
+            color: #444;
+            line-height: 1.6;
+        }
+
+        .lucky {
+            margin-top: 15px;
+            padding: 15px;
+            background: #eef2ff;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* ⭐ 운세 점수 + 게이지 바 */
+        .score-box {
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .score-title {
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 6px;
+        }
+
+        .score-bar {
+            width: 100%;
+            height: 14px;
+            background: #e5e7eb;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .score-fill {
+            height: 100%;
+            background: #6366f1;
+            border-radius: 999px;
+            transition: width 0.8s ease;
+        }
+
+        .score-value {
+            margin-top: 4px;
+            font-size: 13px;
+            color: #333;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        /* 처음으로 돌아가기 버튼 */
+        .home-btn {
+            margin-top: 24px;
+            width: 100%;
+            padding: 12px 0;
+            border-radius: 12px;
+            border: none;
+            background: #111827;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .home-btn:hover {
+            background: #030712;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h1 class="title">🔮 운세 결과</h1>
+
+    <!-- 입력 정보 표시 -->
+    <div class="info">
+        생일:
+        <span th:text="${birthDate}"></span><br/>
+        시간:
+        <span th:text="${birthTime}"></span><br/>
+        별자리:
+        <span th:text="${zodiac}"></span> /
+        띠:
+        <span th:text="${chinese}"></span>
+    </div>
+
+    <!-- ⭐ 운세 점수 & 게이지 바 -->
+    <div class="score-box" th:if="${fortune != null}">
+        <div class="score-title">
+            <span th:switch="${category}">
+                <span th:case="'TODAY'">오늘의 운세 점수</span>
+                <span th:case="'TOMORROW'">내일의 운세 점수</span>
+                <span th:case="'WEEK'">이번 주 운세 점수</span>
+                <span th:case="'MONTH'">이달의 운세 점수</span>
+                <span th:case="'YEAR'">올해의 운세 점수</span>
+                <span th:case="*">운세 점수</span>
+            </span>
+        </div>
+        <div class="score-bar">
+            <div class="score-fill"
+                 th:style="'width:' + ${fortune.score} + '%;'">
+            </div>
+        </div>
+        <div class="score-value"
+             th:text="${fortune.score + '점'}">
+        </div>
+    </div>
+
+    <!-- ✅ 카테고리 전환용 폼 (탭 버튼들이 다 이 폼을 submit 함) -->
+    <form th:action="@{/fortune/result}" method="post">
+        <!-- 이전 입력값 유지용 hidden 필드 -->
+        <input type="hidden" name="birth" th:value="${birthDate}">
+        <input type="hidden" name="gender" th:value="${gender}">
+        <input type="hidden" name="birthTime" th:value="${birthTime}">
+        <input type="hidden" name="calendar" th:value="${calendarType}">
+
+        <!-- 탭 버튼 -->
+        <div class="tab-wrapper">
+            <button type="submit" name="category" value="TODAY"
+                    class="tab-btn"
+                    th:classappend="${category}=='TODAY' ? ' active'">
+                오늘
+            </button>
+
+            <button type="submit" name="category" value="TOMORROW"
+                    class="tab-btn"
+                    th:classappend="${category}=='TOMORROW' ? ' active'">
+                내일
+            </button>
+
+            <button type="submit" name="category" value="WEEK"
+                    class="tab-btn"
+                    th:classappend="${category}=='WEEK' ? ' active'">
+                이번주
+            </button>
+
+            <button type="submit" name="category" value="MONTH"
+                    class="tab-btn"
+                    th:classappend="${category}=='MONTH' ? ' active'">
+                이달
+            </button>
+
+            <button type="submit" name="category" value="YEAR"
+                    class="tab-btn"
+                    th:classappend="${category}=='YEAR' ? ' active'">
+                올해
+            </button>
+        </div>
+    </form>
+
+    <!-- 총운 -->
+    <div class="fortune-card" th:if="${fortune != null}">
+        <div class="card-title">🔮 총운</div>
+        <div class="value" th:text="${fortune.summary}"></div>
+    </div>
+
+    <!-- 애정운 -->
+    <div class="fortune-card" th:if="${fortune != null}">
+        <div class="card-title">❤️ 애정운</div>
+        <div class="value" th:text="${fortune.love}"></div>
+    </div>
+
+    <!-- 금전운 -->
+    <div class="fortune-card" th:if="${fortune != null}">
+        <div class="card-title">💎 금전운</div>
+        <div class="value" th:text="${fortune.money}"></div>
+    </div>
+
+    <!-- 직장운 -->
+    <div class="fortune-card" th:if="${fortune != null}">
+        <div class="card-title">📁 직장·비즈니스 운</div>
+        <div class="value" th:text="${fortune.job}"></div>
+    </div>
+
+    <!-- 건강운 -->
+    <div class="fortune-card" th:if="${fortune != null}">
+        <div class="card-title">💪 건강운</div>
+        <div class="value" th:text="${fortune.health}"></div>
+    </div>
+
+    <!-- 행운 요소 -->
+    <div class="lucky" th:if="${fortune != null}">
+        <div><b>🎨 행운의 색 :</b> <span th:text="${fortune.luckyColor}"></span></div>
+        <div><b>🔢 행운의 숫자 :</b> <span th:text="${fortune.luckyNumber}"></span></div>
+        <div><b>🎁 행운의 아이템 :</b> <span th:text="${fortune.luckyItem}"></span></div>
+    </div>
+
+    <!-- 처음으로 돌아가기 -->
+    <button class="home-btn" type="button" onclick="window.location.href='/fortune'">
+        처음으로 돌아가기
+    </button>
+
+</div>
+</body>
+</html>

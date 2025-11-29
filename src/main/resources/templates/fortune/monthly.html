@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>이달의 운세</title></head>
+<body>
+<h1>이달의 운세 페이지 (디자인 적용 예정)</h1>
+<p th:text="'별자리: ' + ${zodiac}"></p>
+<p th:text="'띠: ' + ${chinese}"></p>
+<p th:text="'운세 요약: ' + ${fortune.summary}"></p>
+</body>
+</html>

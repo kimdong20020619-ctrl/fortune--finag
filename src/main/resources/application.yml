@@ -1,0 +1,22 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/fortune_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: root
+    password: root1234
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+
+  thymeleaf:
+    cache: false
+
+openai:
+  api-key: "너의_ChatGPT_API_키"
